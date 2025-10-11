@@ -35,4 +35,22 @@ export class LoginPage {
         return this.page.locator("#h3[data-test=\"error\"]");
     }
 
+    public async fillUserName(userName: string) {
+        await this.loginInput.clear();
+        await this.loginInput.fill(userName);
+        await this.loginInput.blur();
+    }
+
+    public async fillPassword(password: string) {
+        await this.loginInput.clear();
+        await this.loginInput.fill(password);
+        await this.loginInput.blur();
+    }
+
+    public async login(userName: string, password: string) {
+        await this.open();
+        await this.fillUserName(userName);
+        await this.fillPassword(password);
+        await this.submit.click();
+    }
 }
