@@ -31,8 +31,8 @@ export class LoginPage {
         return this.page.locator("#error-icon");
     }
 
-    get errorText() {
-        return this.page.locator("#h3[data-test=\"error\"]");
+    errorText() {
+        return this.page.locator("h3[data-test=\"error\"]");
     }
 
     public async fillUserName(userName: string) {
@@ -42,13 +42,13 @@ export class LoginPage {
     }
 
     public async fillPassword(password: string) {
-        await this.loginInput.clear();
-        await this.loginInput.fill(password);
-        await this.loginInput.blur();
+        await this.passwordInput.clear();
+        await this.passwordInput.fill(password);
+        await this.passwordInput.blur();
     }
 
     public async login(userName: string, password: string) {
-        await this.open();
+        //await this.open();
         await this.fillUserName(userName);
         await this.fillPassword(password);
         await this.submit.click();
