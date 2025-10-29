@@ -1,4 +1,5 @@
-import {expect, test} from "@playwright/test";
+import {expect} from "@playwright/test";
+import {test} from "../fixtures/login-fixtures"
 import {LoginPage} from "../pages/LoginPage";
 import {generateInvalidUser, User} from "../helpers/dataGenerator";
 
@@ -10,41 +11,22 @@ test.describe("Login page flow", async () => {
         loginPage = new LoginPage(page);
         await loginPage.open();
     });
-
-    test("Successful login @positive", async ({page}) => {
-        await loginPage.login(process.env.BASE_USER, process.env.BASE_PASSWORD);
-
+    test("Successful login @positive", async ({page, loginUser}) => {
         await expect(page).toHaveURL(/inventory.html/);
     });
 
-    test("Incorrect username @negative", async ({page}) => {
-        await loginPage.login(invUser.userName, "secret_sauce");
+    [
+        {userName: invUser.userName, password: "secret_sauce", errMessage: /Epic sadface: Username and password do not match any user in this service/},
+        {userName: "standard_user", password: invUser.password, errMessage: /Epic sadface: Username and password do not match any user in this service/},
+        {userName: " ", password: " ", errMessage: /Epic sadface: Username is required/},
+        {userName: "standard_user", password: " ", errMessage: /Epic sadface: Password is required/},
+        {userName: " ", password: "secret_sauce", errMessage: /Epic sadface: Username is required/}
 
-        await expect(loginPage.errorText()).toHaveText(/Epic sadface: Username and password do not match any user in this service/);
+    ].forEach(({userName, password,errMessage}) => {
+        test("Incorrect username @negative", async ({page}) => {
+            await loginPage.login(userName, password);
+
+            await expect(loginPage.errorText()).toHaveText(errMessage);
+        });
     });
-
-    test("Incorrect password @negative", async ({page}) => {
-        await loginPage.login("standard_user", invUser.password);
-
-        await expect(loginPage.errorText()).toHaveText(/Epic sadface: Username and password do not match any user in this service/);
-    });
-
-    test("Empty input fields @negative", async ({page}) => {
-        await loginPage.login(" ", " ");
-
-        await expect(loginPage.errorText()).toHaveText(/Epic sadface: Username is required/);
-    });
-
-    test("Empty password input field @negative", async ({page}) => {
-        await loginPage.login("standard_user", " ");
-
-        await expect(loginPage.errorText()).toHaveText(/Epic sadface: Password is required/);
-    });
-
-    test("Empty input fields @negative", async ({page}) => {
-        await loginPage.login(" ", "secret_sauce");
-
-        await expect(loginPage.errorText()).toHaveText(/Epic sadface: Username is required/);
-    });
-
 });
